@@ -1,24 +1,33 @@
 Function.prototype.myBind = function(thisArg, ...args){
-    const originalFunc = this;
 
-    if(typeof originalFunc !== 'function') {
+    if(typeof this !== 'function') {
         return new Error('Bind must be called on a function');
     }
 
-    return function(...innerArgs) {
+    const originalFunc = this;
 
-        const finalArgs = args.concat(innerArgs);
+    function boundFunction(...innerArgs) {
 
-        if(this instanceof originalFunc) {
-            return new originalFunc(finalArgs);
+        if(this instanceof boundFunction) {
+            return new originalFunc(args.concat(innerArgs));
         }
 
-        return originalFunc.apply(thisArg, finalArgs);
+        return originalFunc.apply(thisArg, args.concat(innerArgs));
     }
+
+    if(originalFunc.prototype) {
+        boundFunction.prototype = originalFunc.prototype;
+    }
+
+    return boundFunction;
 }
 
 Function.prototype.myBind1 = function(thisArg, ...args){
-    const uniqueId = Symbol();
+    if(typeof this !== 'function') {
+        return new Error("Bind must be called on a function");
+    }
+
+    const uniqueId = Symbol('fn');
     const wrappedObj = Object(thisArg);
 
     Object.defineProperty(wrappedObj, uniqueId, {
@@ -61,7 +70,7 @@ const person2 = {
 
 const boundFullName1 = fullName.myBind(person1, "Hello");
 const boundFullName2 = fullName.myBind1(person2, "Hey");
-const boundFullName3 = fullName.myBind1(person2, "Hi");
+const boundFullName3 = fullName.myBind2(person2, "Hi");
 
 boundFullName1();
 boundFullName2();

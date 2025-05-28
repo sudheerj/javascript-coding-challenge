@@ -54,3 +54,16 @@ setTimeout(() => debouncedCounter(), 50);
 setTimeout(() => debouncedCounter(), 100);
 setTimeout(() => debouncedCounter(), 200);
 setTimeout(() => debouncedCounter(), 300);
+
+    
+/** 
+    Timeline of Events
+    At 50ms: debouncedCounter() is called.
+    Schedules increment to run at 150ms (50ms + 100ms).
+    At 100ms: debouncedCounter() is called again.
+    Cancels previous timeout, schedules increment to run at 200ms (100ms + 100ms).
+    At 200ms: debouncedCounter() is called again.
+    Cancels previous timeout, schedules increment to run at 300ms (200ms + 100ms).
+    At 300ms: debouncedCounter() is called again.
+    Cancels previous timeout, schedules increment to run at 400ms (300ms + 100ms). 
+*/

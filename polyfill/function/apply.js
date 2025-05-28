@@ -1,5 +1,5 @@
 Function.prototype.myApply = function(thisArg, args=[]) {
-    thisArg = thisArg || globalThis;
+    thisArg = (thisArg === null || thisArg === undefined) ? globalThis : Object(thisArg);
 
     const uniqueId = Symbol('fn');
     thisArg[uniqueId] = this;
@@ -11,18 +11,21 @@ Function.prototype.myApply = function(thisArg, args=[]) {
 }
 
 Function.prototype.myApply1 = function(thisArg, args=[]) {
+    thisArg = (thisArg === null || thisArg === undefined) ? globalThis : Object(thisArg);
+
     const uniqueId = Symbol('fn');
-    const wrappedObj = Object(thisArg);
-    Object.defineProperty(wrappedObj, uniqueId, {
+    Object.defineProperty(thisArg, uniqueId, {
         enumerable: false,
         value: this
     });
+    const result = thisArg[uniqueId](...args);
+    delete thisArg[uniqueId];
 
-    return wrappedObj[uniqueId](...args);
+    return result;
 }
 
 Function.prototype.myApply2 = function(thisArg, args=[]) {
-    return this.call(thisArg, ...args);
+    return this.call(thisArg, ...args)
 }
 
 Function.prototype.myApply3 = function(thisArg, args=[]) {

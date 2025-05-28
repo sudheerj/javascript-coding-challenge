@@ -1,5 +1,6 @@
 Function.prototype.myCall = function(thisArg, ...args) {
-    thisArg = thisArg || globalThis;
+    // Properly handle null/undefined as globalThis, and convert primitives to objects
+    thisArg = (thisArg === null || thisArg === undefined) ? globalThis : Object(thisArg);
 
     const uniqueId = Symbol('fn');
     thisArg[uniqueId] = this;
@@ -11,14 +12,19 @@ Function.prototype.myCall = function(thisArg, ...args) {
 }
 
 Function.prototype.myCall1 = function(thisArg, ...args) {
+    // Properly handle null/undefined as globalThis, and convert primitives to objects
+    thisArg = (thisArg === null || thisArg === undefined) ? globalThis : Object(thisArg);
+
     const uniqueId = Symbol('fn');
-    const wrappedObj = Object(thisArg);
-    Object.defineProperty(wrappedObj, uniqueId, {
+    Object.defineProperty(thisArg, uniqueId, {
         enumerable: false,
         value: this
     });
 
-    return wrappedObj[uniqueId](...args);
+    const result = thisArg[uniqueId](...args);
+    delete thisArg[uniqueId];
+
+    return result;
 }
 
 Function.prototype.myCall2 = function(thisArg, ...args) {
@@ -35,7 +41,7 @@ const person1 = {
 }
 
 function details(age = 30) {
-    return this.firstName + ' '+this.lastName + ' is ' + age + ' years old';
+    return this.firstName + ' ' + this.lastName + ' is ' + age + ' years old';
 }
 
 console.log(details.myCall(person1, 35));
