@@ -1,6 +1,6 @@
 Array.prototype.myAt = function(index) {
     let len = this.length;
-    let relativeIndex = Number(index);
+    let relativeIndex = Number(index) || 0;
     let boundedIndex = relativeIndex >=0 ? relativeIndex : len+relativeIndex;
 
     if(boundedIndex < 0 && boundedIndex >= len) {

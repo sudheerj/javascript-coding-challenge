@@ -1,5 +1,5 @@
-function isPrimitiveOrFunctionType(inputVal){
-    return inputVal === null || typeof inputVal !== 'object' || typeof inputVal === 'function';
+function isNonObject(inputVal){
+    return inputVal === null || typeof inputVal !== 'object';
 }
 
 function getType(inputVal){
@@ -7,11 +7,11 @@ function getType(inputVal){
 }
 
 function deepClone2(inputVal){
-    return deepCloneWithCache(inputVal, new Map());
+    return deepCloneWithCache(inputVal, new WeakMap());
 }
 
 function deepCloneWithCache(inputVal, cache) {
-    if(isPrimitiveOrFunctionType(inputVal)) {
+    if(isNonObject(inputVal)) {
         return inputVal;
     }
 
@@ -25,13 +25,16 @@ function deepCloneWithCache(inputVal, cache) {
     switch(type) {
         case 'set':
             cloned = new Set();
+            cache.set(inputVal, cloned);
             inputVal.forEach(item => cloned.add(deepCloneWithCache(item, cache)));
             break;
         case 'map':
             cloned = new Map();
+            cache.set(inputVal, cloned);
             inputVal.forEach((val, key) => cloned.set(deepCloneWithCache(key, cache), deepCloneWithCache(val, cache)));
             break;
         case 'array':
+            cache.set(inputVal, cloned);
             cloned = inputVal.map(item => deepCloneWithCache(item, cache));
             break;
         case 'date':
@@ -44,7 +47,13 @@ function deepCloneWithCache(inputVal, cache) {
             cloned = Object.create(Object.getPrototypeOf(inputVal));
             cache.set(inputVal, cloned);
             for (const key of Reflect.ownKeys(inputVal)) {
-                cloned[key] = deepCloneWithCache(inputVal[key], cache);
+                const desc = Object.getOwnPropertyDescriptor(inputVal, key);
+                if(desc.get || desc.set) {
+                    Object.defineProperty(cloned, key, desc);
+                } else {
+                    desc.value = deepCloneWithCache(inputVal[key], cache);
+                    Object.defineProperty(cloned, key, desc);
+                }
             }
     }
     return cloned;
