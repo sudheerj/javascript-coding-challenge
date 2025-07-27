@@ -5,8 +5,12 @@ Function.prototype.myCall = function(thisArg, ...args) {
     const uniqueId = Symbol('fn');
     thisArg[uniqueId] = this;
 
-    const result = thisArg[uniqueId](...args);
-    delete thisArg[uniqueId];
+    let result;
+    try {
+        result = thisArg[uniqueId](...args);
+    } finally {
+        delete thisArg[uniqueId];
+    }
 
     return result;
 }
@@ -21,8 +25,12 @@ Function.prototype.myCall1 = function(thisArg, ...args) {
         value: this
     });
 
-    const result = thisArg[uniqueId](...args);
-    delete thisArg[uniqueId];
+    let result;
+    try {
+        result = thisArg[uniqueId](...args);
+    } finally {
+        delete thisArg[uniqueId];
+    }
 
     return result;
 }

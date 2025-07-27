@@ -4,8 +4,12 @@ Function.prototype.myApply = function(thisArg, args=[]) {
     const uniqueId = Symbol('fn');
     thisArg[uniqueId] = this;
 
-    const result = thisArg[uniqueId](...args);
-    delete thisArg[uniqueId];
+    let result;
+    try {
+        result = thisArg[uniqueId](...args);
+    } finally {
+        delete thisArg[uniqueId];
+    }
 
     return result;
 }
@@ -18,8 +22,13 @@ Function.prototype.myApply1 = function(thisArg, args=[]) {
         enumerable: false,
         value: this
     });
-    const result = thisArg[uniqueId](...args);
-    delete thisArg[uniqueId];
+
+    let result;
+    try {
+        result = thisArg[uniqueId](...args);
+    } finally {
+        delete thisArg[uniqueId];
+    }
 
     return result;
 }

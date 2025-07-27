@@ -9,14 +9,15 @@ Function.prototype.myBind = function(thisArg, ...args){
     function boundFunction(...innerArgs) {
 
         if(this instanceof boundFunction) {
-            return new originalFunc(args.concat(innerArgs));
+            return new originalFunc(...args, ...innerArgs);
         }
 
-        return originalFunc.apply(thisArg, args.concat(innerArgs));
+        return originalFunc.apply(thisArg, [...args, ...innerArgs]);
     }
 
     if(originalFunc.prototype) {
-        boundFunction.prototype = originalFunc.prototype;
+        boundFunction.prototype = Object.create(originalFunc.prototype);
+        boundFunction.prototype.constructor = boundFunction;
     }
 
     return boundFunction;
